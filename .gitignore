@@ -1,0 +1,14 @@
+/Library/
+/Logs/
+/Temp/
+/obj/
+/UserSettings/
+/.vs/
+/.vscode/
+/.mypy_cache/
+/.venv/
+test_Data/
+/Assets/StreamingAssets/
+
+*.csproj
+*.sln
