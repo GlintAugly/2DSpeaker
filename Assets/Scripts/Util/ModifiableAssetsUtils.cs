@@ -2,6 +2,7 @@ using UnityEngine;
 using System;
 using UnityEngine.Networking;
 using System.IO;
+using System.Linq;
 
 public class ModifiableAssetsUtils
 {
@@ -18,6 +19,18 @@ public class ModifiableAssetsUtils
 #endif
     }
 
+    public static string[] GetProjects()
+    {
+        var targetPath = GetModifiableAssetsSubfolderPath(Definition.SCRIPT_FOLDER);
+
+        if (!Directory.Exists(targetPath))
+        {
+            AppDebug.LogError("プロジェクトフォルダが見つかりません: {0}", targetPath);
+            return Array.Empty<string>();
+        }
+
+        return Directory.GetDirectories(targetPath).Select(Path.GetFileName).ToArray();
+    }
 	/// <summary>
 	/// ModifiableAssetsからAudioClipを読み込む
 	/// </summary>
