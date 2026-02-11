@@ -19,18 +19,35 @@ public class ModifiableAssetsUtils
 #endif
     }
 
-    public static string[] GetProjects()
+    public static bool IsFileExists(string subfolder, string fileName)
     {
-        var targetPath = GetModifiableAssetsSubfolderPath(Definition.SCRIPT_FOLDER);
+        var filePath = Path.Combine(GetModifiableAssetsSubfolderPath(subfolder), fileName);
+        return File.Exists(filePath);
+    }
+    public static string[] GetFolders(string targetSubFolder)
+    {
+        var targetPath = GetModifiableAssetsSubfolderPath(targetSubFolder);
 
         if (!Directory.Exists(targetPath))
         {
-            AppDebug.LogError("プロジェクトフォルダが見つかりません: {0}", targetPath);
+            AppDebug.LogError("対象フォルダが見つかりません: {0}", targetPath);
             return Array.Empty<string>();
         }
 
         return Directory.GetDirectories(targetPath).Select(Path.GetFileName).ToArray();
     }
+
+    public static void CreateFolderIfNotExists(string targetSubFolder, string folderName)
+    {
+        var targetPath = GetModifiableAssetsSubfolderPath(targetSubFolder);
+        var newFolderPath = Path.Combine(targetPath, folderName);
+
+        if (!Directory.Exists(newFolderPath))
+        {
+            Directory.CreateDirectory(newFolderPath);
+        }
+    }
+
 	/// <summary>
 	/// ModifiableAssetsからAudioClipを読み込む
 	/// </summary>

@@ -54,7 +54,7 @@ public class EndingController : MonoBehaviour
         ChangeText();
         StartCoroutine(ModifiableAssetsUtils.LoadAudioClipCoroutine(Definition.BGM_FOLDER, endingDataObj.bgmName, clip => SoundManager.PlayBGM(clip)));
         StartCoroutine(ShowCreditCoroutine(endingDataObj.bgmCredit));
-        Fade.StartFadeIn(0.2f);
+        Fade.StartFadeIn(0.2f, Camera.main);
     }
 
     void Update() 

@@ -21,7 +21,7 @@ public class TitleController : MonoBehaviour
         editButton.onClick.AddListener(OnEditButtonClicked);
 
         projectDropdown.ClearOptions();
-        var options = ModifiableAssetsUtils.GetProjects().Select(p => new Dropdown.OptionData(p)).ToList();
+        var options = ProjectManager.GetAllProjects().Select(p => new Dropdown.OptionData(p)).ToList();
         if (options.Count == 0)
         {
             noProjectsText.gameObject.SetActive(true);
@@ -49,7 +49,7 @@ public class TitleController : MonoBehaviour
 
     private void OnEditButtonClicked()
     {
-        Debug.Log("Edit button clicked.");
+        SceneManager.LoadScene("Editor");
         // Add logic to open the editor for the selected project
     }
 }
