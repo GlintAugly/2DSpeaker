@@ -6,11 +6,13 @@ using UnityEngine.SceneManagement;
 [RequireComponent(typeof(Image))]
 public class Fade : MonoBehaviourSingleton<Fade> {
     private Image m_render;
+    private Canvas m_canvas;
     private EFadeStatus m_fade;
     public static bool IsFadeOut => Instance.m_fade == EFadeStatus.FadeOut;
     Coroutine m_coroutine;
     private Sprite m_blackFadeSprite;
     private Sprite m_whiteFadeSprite;
+    const string FADE_LAYER_NAME = "Fade";
     const string BLACK_FADE_SPRITE_PATH = "Image/makkuro";
     const string WHITE_FADE_SPRITE_PATH = "Image/white";
     public enum EFadeType
@@ -39,9 +41,9 @@ public class Fade : MonoBehaviourSingleton<Fade> {
         {
             SceneManager.MoveGameObjectToScene(gameObject, SceneManager.GetActiveScene());
             GameObject canvasObject = new("Canvas");
-            Canvas canvas = canvasObject.AddComponent<Canvas>();
-            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            canvas.sortingOrder = Definition.MAX_SORTING_ORDER;
+            m_canvas = canvasObject.AddComponent<Canvas>();
+            m_canvas.renderMode = RenderMode.ScreenSpaceCamera;
+            m_canvas.sortingOrder = Definition.MAX_SORTING_ORDER;
             transform.SetParent(canvasObject.transform);
             DontDestroyOnLoad(canvasObject);
         }
@@ -57,12 +59,12 @@ public class Fade : MonoBehaviourSingleton<Fade> {
         m_whiteFadeSprite = Resources.Load<Sprite>(WHITE_FADE_SPRITE_PATH);
     }
 
-    public static void StartFadeIn(float setTime, EFadeType fadeType = EFadeType.Black)
+    public static void StartFadeIn(float setTime, Camera targetCamera, EFadeType fadeType = EFadeType.Black)
     {
         Sprite sprite = FetchFadeSprite(fadeType);
-        StartFadeIn(setTime, sprite);
+        StartFadeIn(setTime, targetCamera, sprite);
     }
-    public static void StartFadeIn(float setTime, Sprite sprite)
+    public static void StartFadeIn(float setTime, Camera targetCamera, Sprite sprite)
     {
         if (Instance.m_coroutine != null)
         {
@@ -72,17 +74,22 @@ public class Fade : MonoBehaviourSingleton<Fade> {
         {
             Instance.m_render.sprite = sprite;
         }
+        Instance.m_canvas.worldCamera = targetCamera;
+        if(targetCamera != null)
+        {
+            Instance.m_canvas.sortingLayerName = FADE_LAYER_NAME;
+        }
         Instance.m_fade = EFadeStatus.FadeIn;
         Instance.m_coroutine = Instance.StartCoroutine(Instance.FadeCoroutine(EFadeStatus.FadeIn, setTime));
     }
 
-    public static void StartFadeOut(float setTime, EFadeType fadeType = EFadeType.Black)
+    public static void StartFadeOut(float setTime, Camera targetCamera, EFadeType fadeType = EFadeType.Black)
     {
         Sprite sprite = FetchFadeSprite(fadeType);
-        StartFadeOut(setTime, sprite);
+        StartFadeOut(setTime, targetCamera, sprite);
     }
     
-    public static void StartFadeOut(float setTime, Sprite sprite)
+    public static void StartFadeOut(float setTime, Camera targetCamera, Sprite sprite)
     {
         if (Instance.m_coroutine != null)
         {
@@ -93,6 +100,11 @@ public class Fade : MonoBehaviourSingleton<Fade> {
             Instance.m_render.sprite = sprite;
         }
         Instance.m_fade = EFadeStatus.FadeOut;
+        Instance.m_canvas.worldCamera = targetCamera;
+        if(targetCamera != null)
+        {
+            Instance.m_canvas.sortingLayerName = FADE_LAYER_NAME;
+        }
         Instance.m_coroutine = Instance.StartCoroutine(Instance.FadeCoroutine(EFadeStatus.FadeOut, setTime));
     }
 

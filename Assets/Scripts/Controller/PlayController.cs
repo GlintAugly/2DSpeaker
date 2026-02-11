@@ -22,6 +22,21 @@ public class PlayController : MonoBehaviour
 		Ground,
 	}
 
+	private int m_editorSelectedIndex = -1;
+	public int EditorSelectedIndex {
+		get
+		{
+			return m_editorSelectedIndex;
+		}
+		set
+		{
+			m_editorSelectedIndex = value;
+			LoadScriptReader();
+		}
+	}
+	bool IsEditMode { get { return m_editorSelectedIndex >= 0; } }
+	bool IsPauseInEditMode { get { return IsEditMode && m_scriptReader != null && m_editorSelectedIndex < m_scriptReader.CurrentIndex; } }
+
 	[SerializeField]
 	private GameObject m_textFrame;
 	[SerializeField]
@@ -38,6 +53,9 @@ public class PlayController : MonoBehaviour
 	private Font m_defaultFont;
 	[SerializeField]
 	private int m_defaultFontSize;
+	[SerializeField]
+	private Camera m_mainCamera;
+	public Camera MainCamera { get { return m_mainCamera; } }
 
 	private IDictionary<string, CharBody> m_characters = new Dictionary<string, CharBody>();
 	private IDictionary<string, Text> m_texts = new Dictionary<string, Text>();
@@ -127,15 +145,27 @@ public class PlayController : MonoBehaviour
 	/// </summary>
 	void Start()
 	{
-		Initialize();
-	}
+		if(ProjectManager.IsProjectSelected() == false)
+		{
+			// プロジェクトが選択されていないときはエディットモードとする。
+			EditorSelectedIndex = 0;
+			return;
+		}
 
-	void Initialize()
-	{
 		PlaySceneInitializeData initData = PlaySceneInitializeData.LoadFromJson(
 			ModifiableAssetsUtils.LoadTextFile(ProjectManager.GetScriptFolder(), Definition.PLAY_SCENE_INITIALIZE_DATA_FILE)
 		);
+		if(initData == null || initData.characters == null || initData.characters.Length == 0)
+		{
+			// 初期化データの読み込みに失敗
+			AppDebug.LogError("PlayController: 初期化データの読み込みに失敗しました。");
+			return;
+		}
+		Initialize(initData);
+	}
 
+	public void Initialize(PlaySceneInitializeData initData)
+	{
 		// キャラクターとテキストオブジェクトの生成・初期化
 		InitializeCaharacters(initData);
 
@@ -166,9 +196,23 @@ public class PlayController : MonoBehaviour
 		m_interval = initData.talkInterval;
 		
 		// スクリプトの読み込み・初期設定
-		m_scriptReader = new JsonScriptReader(ProjectManager.GetScriptFolder(), Definition.EXEC_SCRIPT_FILE);
+		LoadScriptReader();
 		m_isEnd = false;
-		Fade.StartFadeIn(START_FADE_TIME);
+		Fade.StartFadeIn(START_FADE_TIME, m_mainCamera);
+	}
+
+	void LoadScriptReader()
+	{
+		if(ModifiableAssetsUtils.IsFileExists(ProjectManager.GetScriptFolder(), Definition.EXEC_SCRIPT_FILE) == false)
+		{
+			// Editモードではスクリプトファイルが存在しなくてもよい.
+			if (!IsEditMode)
+			{
+				AppDebug.LogError("ERR: スクリプトファイルが存在しません: {0}", Definition.EXEC_SCRIPT_FILE);
+			}
+			return;
+		}
+		m_scriptReader = new JsonScriptReader(ProjectManager.GetScriptFolder(), Definition.EXEC_SCRIPT_FILE);
 	}
 
 	void InitializeCaharacters(PlaySceneInitializeData initData)
@@ -196,7 +240,7 @@ public class PlayController : MonoBehaviour
 				continue;
 			}
 			// キャラクター生成・初期化
-			var charaInstance = Instantiate(m_characterTemplate, null);
+			var charaInstance = Instantiate(m_characterTemplate, transform);
 			charaInstance.name = charDataItem.name;
 			charaInstance.SetActive(false);
 			var charBody = charaInstance.GetComponent<CharBody>();
@@ -265,6 +309,20 @@ public class PlayController : MonoBehaviour
 	/// </summary>
 	void Update ()
 	{
+		if(m_scriptReader == null)
+		{
+			// スクリプトファイルが存在しない.
+			return;
+		}
+		if(IsPauseInEditMode)
+		{
+			return;
+		}
+		if(EditorSelectedIndex > m_scriptReader.CurrentIndex)
+		{
+			// Editorモードで現在のインデックスまで進める.
+			m_stopMute = EditorSelectedIndex - 1;
+		}
 		m_timer -= Time.deltaTime;
 		if (m_talktimer > 0)
 		{
@@ -277,49 +335,54 @@ public class PlayController : MonoBehaviour
 		if (m_timer <= 0f)
 		{
 			// 終了処理.
-			if (true == m_isEnd)
+			if (true == m_isEnd && !IsEditMode)
 			{
 				m_timer = float.MaxValue;
 				SceneManager.LoadScene("Ending");
 				return;
 			}
-			while (m_timer <= 0f && !m_isEnd)
+			Execute();
+		}
+	}
+
+	void Execute()
+	{
+		while (m_timer <= 0f && !m_isEnd && !IsPauseInEditMode)
+		{
+			// 終了判定.
+			if (m_scriptReader.IsAllRead)
 			{
-				// 終了判定.
-				if (m_scriptReader.IsAllRead)
+				CloseAllText();
+				if (!Fade.IsFadeOut)
 				{
-					CloseAllText();
-					if (!Fade.IsFadeOut)
-					{
-						Fade.StartFadeOut(END_FADE_TIME);
-					}
-					m_timer = END_FADE_TIME;
-					m_isEnd = true;
-					break;
+					Fade.StartFadeOut(END_FADE_TIME, m_mainCamera);
 				}
-				if (m_scriptReader.ReadNextCommand(out string commandName, out Parameters parameters))
+				m_timer = END_FADE_TIME;
+				m_isEnd = true;
+				break;
+			}
+			if (m_scriptReader.ReadNextCommand(out string commandName, out Parameters parameters))
+			{
+				if (m_commandMap.TryGetValue(commandName, out var comandData))
 				{
-					if (m_commandMap.TryGetValue(commandName, out var comandData))
+					var func = comandData.Item1;
+					var spec = comandData.Item2;
+					if (func == null || spec == null)
 					{
-						var func = comandData.Item1;
-						var spec = comandData.Item2;
-						if (func == null || spec == null)
+						AppDebug.LogWarning("コマンドハンドラーまたは仕様が未定義: {0}", commandName);
+						continue;
+					}
+					if (func(parameters, spec))
+					{
+						if (SafeCast(parameters, spec, "wait", out float waitTime))
 						{
-							AppDebug.LogWarning("コマンドハンドラーまたは仕様が未定義: {0}", commandName);
-							continue;
-						}
-						if (func(parameters, spec))
-						{
-							if (SafeCast(parameters, spec, "wait", out float waitTime))
-							{
-								Wait(waitTime);
-							}
+							Wait(waitTime);
 						}
 					}
-					else
-					{
-						AppDebug.LogError("不明なコマンド:{0}", commandName);
-					}
+				}
+				else
+				{
+					AppDebug.LogError("不明なコマンド:{0}", commandName);
 				}
 			}
 		}
@@ -1092,7 +1155,7 @@ public class PlayController : MonoBehaviour
 			AppDebug.LogError("Command 'fadeIn' missing required parameters. index:{0}", m_scriptReader.CurrentIndex);
 			return false;
 		}
-		Fade.StartFadeIn(time);
+		Fade.StartFadeIn(time, m_mainCamera);
 		return true;
 	}
 
@@ -1103,13 +1166,13 @@ public class PlayController : MonoBehaviour
 			AppDebug.LogError("Command 'fadeOut' missing required parameters. index:{0}", m_scriptReader.CurrentIndex);
 			return false;
 		}
-		Fade.StartFadeOut(time);
+		Fade.StartFadeOut(time, m_mainCamera);
 		return true;
 	}
 
 	bool CallEnding(Parameters _, CommandSpec __)
 	{
-		Fade.StartFadeOut(END_FADE_TIME);
+		Fade.StartFadeOut(END_FADE_TIME, m_mainCamera);
 		m_timer = END_FADE_TIME;
 		m_isEnd = true;
 		return true;
