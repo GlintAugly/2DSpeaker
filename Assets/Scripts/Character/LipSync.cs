@@ -112,7 +112,7 @@ public class LipSync : MonoBehaviour
 	// Update is called once per frame
 	void Update () 
 	{
-        if (m_talkAudio != null && m_talkAudio.isPlaying)
+        if (m_talkAudio != null)
 		{
 			if(m_talkingSprites.ContainsKey(m_charParts.EmotionFile))
 			{
@@ -123,11 +123,6 @@ public class LipSync : MonoBehaviour
 				// 該当する口パクアニメーションがないなら、判定にもう入らないようにする.
 				SetTalkAudio(null);
 			}
-		}
-		else if(m_mouthRenderer.sprite != m_charParts.BaseSprite)
-		{
-			// 再生終了時はデフォルトの口パーツに戻す.
-			m_mouthRenderer.sprite = m_charParts.BaseSprite;
 		}
 	}
 
