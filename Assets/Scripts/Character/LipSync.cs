@@ -57,15 +57,44 @@ public class LipSync : MonoBehaviour
 			m_audioSamples = new float[0];
 			return;
 		}
-		if (m_audioSamples.Length != m_talkAudio.clip.samples)
-		{
-			m_audioSamples = new float[m_talkAudio.clip.samples];
-		}
+		PrepareAudioSamples();
 		m_talkAudio.clip.GetData(m_audioSamples, 0);
 		m_lastTimeSample = 0;
 	}
 
-	// Use this for initialization
+	void PrepareAudioSamples()
+	{
+		var clip = m_talkAudio.clip;
+		int samples = clip.samples;
+		int channels = clip.channels;
+		float[] tempSamples = new float[samples * channels];
+		clip.GetData(tempSamples, 0);
+		if (m_audioSamples.Length != samples)
+		{
+			m_audioSamples = new float[samples];
+		}
+		// マルチチャンネル対応
+		if (channels == 1)
+		{
+			// モノラルはそのままコピー.
+			Array.Copy(tempSamples, m_audioSamples, samples);
+		}
+		else
+		{
+			// ステレオ以上は平均化してモノラル化.
+			for (int i = 0; i < samples; i++)
+			{
+				float sum = 0f;
+				int baseIndex = i * channels;
+				for (int c = 0; c < channels; c++)
+				{
+					sum += tempSamples[baseIndex + c];
+				}
+				m_audioSamples[i] = sum / channels;
+			}
+		}
+	}
+
 	void Start () 
 	{
 		m_mouthRenderer = gameObject.GetComponent<SpriteRenderer>();
@@ -96,6 +125,11 @@ public class LipSync : MonoBehaviour
 				SetTalkAudio(null);
 			}
 		}
+		else if(m_mouthRenderer.sprite != m_charParts.BaseSprite)
+		{
+			// 再生終了時はデフォルトの口パーツに戻す.
+			m_mouthRenderer.sprite = m_charParts.BaseSprite;
+		}
 	}
 
 	void UpdateLipSyncByVolume(Sprite defaultSprite, string spriteName)
@@ -116,33 +150,41 @@ public class LipSync : MonoBehaviour
 			return;
 		}
 		float sum = 0f;
-		for (int i = m_lastTimeSample; i < Math.Min(nowTimeSamples, m_audioSamples.Length); i++)
+		int startSample = Mathf.Clamp(m_lastTimeSample, 0, m_audioSamples.Length);
+		int endSample = Mathf.Clamp(nowTimeSamples, 0, m_audioSamples.Length);
+		int windowLength = endSample - startSample;
+		if (windowLength <= 0)
+		{
+			m_lastTimeSample = nowTimeSamples;
+			return;
+		}
+		for (int i = startSample; i < endSample; i++)
 		{
 			float sample = m_audioSamples[i];
 			sum += sample * sample;
 		}
-		float rms = Mathf.Sqrt(sum / m_audioSamples.Length);
-		AppDebug.Log("LipSync RMS: {0}", rms);
-		float rmsBorder = RMS_BORDER_MULTIPLIER * m_maxRms;
-		if(rms < rmsBorder)
+		float rms = Mathf.Sqrt(sum / windowLength);
+		
+		if(rms <= 0f)
 		{
-			rms = 0f;
+			m_mouthRenderer.sprite = defaultSprite;
 		}
-		m_maxRms = Mathf.Max(m_maxRms, rms);
-
-		int maxIndex = animationData.animationSprites.Length;
-		int talkIndex = Mathf.Clamp(Mathf.FloorToInt((rms - rmsBorder) / (m_maxRms - rmsBorder) * maxIndex) + 1, 0, maxIndex);
-		if (talkIndex != m_lastTalkSpriteIndex)
+		else
 		{
-			if(talkIndex == 0)
+			float rmsBorder = RMS_BORDER_MULTIPLIER * m_maxRms;
+			if(rms < rmsBorder)
 			{
-				m_mouthRenderer.sprite = defaultSprite;
+				rms = 0f;
 			}
-			else
+			m_maxRms = Mathf.Max(m_maxRms, rms);
+
+			int maxIndex = animationData.animationSprites.Length;
+			int talkIndex = Mathf.Clamp(Mathf.FloorToInt((rms - rmsBorder) / (m_maxRms - rmsBorder) * maxIndex) + 1, 0, maxIndex);
+			if (talkIndex != m_lastTalkSpriteIndex)
 			{
-				m_mouthRenderer.sprite = animationData.animationSprites[talkIndex - 1];
+				m_mouthRenderer.sprite = talkIndex == 0 ? defaultSprite : animationData.animationSprites[talkIndex - 1];
+				m_lastTalkSpriteIndex = talkIndex;
 			}
-			m_lastTalkSpriteIndex = talkIndex;
 		}
 		m_lastTimeSample = nowTimeSamples;
 	}
