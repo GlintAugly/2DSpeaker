@@ -16,11 +16,9 @@ public class LipSync : MonoBehaviour
 	private CharParts m_charParts;
 	private Dictionary<string, LipSyncAnimationData> m_talkingSprites = new();
 	private float[] m_audioSamples = new float[GET_SAMPLES_LENGTH];
-	private int m_lastTimeSample = 0;
 	private int m_lastTalkSpriteIndex = -1;
 	private float m_maxRms = MAX_RMS_DEFAULT;
 	private const int GET_SAMPLES_LENGTH = 1024;
-	private const int MIN_CHANGE_INTERVAL_SAMPLES = 100;
 	private const float RMS_BORDER_MULTIPLIER = 0.1f;
 	private const float MAX_RMS_DEFAULT = 0f;
 
@@ -58,7 +56,6 @@ public class LipSync : MonoBehaviour
 			this.enabled = false;
 			return;
 		}
-		m_lastTimeSample = 0;
 		this.enabled = true;
 	}
 
@@ -106,11 +103,6 @@ public class LipSync : MonoBehaviour
 			SetTalkAudio(null);
 			return;
 		}
-		int nowTimeSamples = m_talkAudio.timeSamples;
-		if (nowTimeSamples - m_lastTimeSample < MIN_CHANGE_INTERVAL_SAMPLES)
-		{
-			return;
-		}
 		m_talkAudio.GetOutputData(m_audioSamples, 0);
 		float sum = 0f;
 		for (int i = 0; i < m_audioSamples.Length; i++)
@@ -138,6 +130,5 @@ public class LipSync : MonoBehaviour
 				m_lastTalkSpriteIndex = talkIndex;
 			}
 		}
-		m_lastTimeSample = nowTimeSamples;
 	}
 }
