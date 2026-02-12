@@ -9,7 +9,7 @@ public class EditProjectController : MonoBehaviour
     [NonSerialized]
     public string m_projectName;
     [SerializeField]
-    readonly EventSystem m_eventSystemForEditor;
+    EventSystem m_eventSystemForEditor;
     PlayController m_playController;
     const string PLAY_SCENE_NAME = "Play";
     const float PLAY_CAMERA_CLAMP = 0.7f;

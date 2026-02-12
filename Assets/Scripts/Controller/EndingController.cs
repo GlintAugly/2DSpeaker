@@ -7,13 +7,13 @@ using UnityEngine.UI;
 public class EndingController : MonoBehaviour 
 {
     [SerializeField]
-    private readonly Text m_upperTitle;
+    private Text m_upperTitle;
     [SerializeField]
-    private readonly Text m_upperBody;
+    private Text m_upperBody;
     [SerializeField]
-    private readonly Text m_downerTitle;
+    private Text m_downerTitle;
     [SerializeField]
-    private readonly Text m_downerBody;
+    private Text m_downerBody;
 	[SerializeField]
 	private readonly Text m_credit;
 

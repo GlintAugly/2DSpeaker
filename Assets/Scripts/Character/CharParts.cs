@@ -16,7 +16,7 @@ public class CharParts : MonoBehaviour
 	}
 
 	[SerializeField]
-	private readonly EPartName m_partsName;
+	private EPartName m_partsName;
 	public string EmotionFile { get; private set; }
 	public Sprite BaseSprite { get; private set; }
 	private SpriteRenderer m_spriteRenderer;

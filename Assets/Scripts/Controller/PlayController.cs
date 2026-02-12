@@ -38,23 +38,23 @@ public class PlayController : MonoBehaviour
 	bool IsPauseInEditMode { get { return IsEditMode && m_scriptReader != null && m_editorSelectedIndex < m_scriptReader.CurrentIndex; } }
 
 	[SerializeField]
-	private readonly GameObject m_textFrame;
+	private GameObject m_textFrame;
 	[SerializeField]
-	private readonly Animator m_blackBoard;
+	private Animator m_blackBoard;
 	[SerializeField]
-	private readonly Text m_blackBoardText;
+	private Text m_blackBoardText;
 	[SerializeField]
-	private readonly SpriteRenderer m_backGround;
+	private SpriteRenderer m_backGround;
 	[SerializeField]
-	private readonly Text m_credit;
+	private Text m_credit;
 	[SerializeField]
-	private readonly GameObject m_characterTemplate;
+	private GameObject m_characterTemplate;
 	[SerializeField]
-	private readonly Font m_defaultFont;
+	private Font m_defaultFont;
 	[SerializeField]
-	private readonly int m_defaultFontSize;
+	private int m_defaultFontSize;
 	[SerializeField]
-	private readonly Camera m_mainCamera;
+	private Camera m_mainCamera;
 	public Camera MainCamera { get { return m_mainCamera; } }
 
 	private readonly Dictionary<string, CharBody> m_characters = new();
