@@ -13,21 +13,21 @@ public class EditorController : MonoBehaviour
     }
 
     [SerializeField]
-    Button m_editCharacterButton;
+    readonly Button m_editCharacterButton;
     [SerializeField]
-    GameObject m_editProjectMenu;
+    readonly GameObject m_editProjectMenu;
     [SerializeField]
-    InputField m_projectNameInputField;
+    readonly InputField m_projectNameInputField;
     [SerializeField]
-    Button m_newProjectButton;
+    readonly Button m_newProjectButton;
     [SerializeField]
-    Dropdown m_existingProjectsDropdown;
+    readonly Dropdown m_existingProjectsDropdown;
     [SerializeField]
-    Button m_editExistingProjectButton;
+    readonly Button m_editExistingProjectButton;
     [SerializeField]
-    Button m_backToTitleButton;
+    readonly Button m_backToTitleButton;
 
-    Dictionary<EditorMode, GameObject> m_modeCanvases = new Dictionary<EditorMode, GameObject>();
+    readonly Dictionary<EditorMode, GameObject> m_modeCanvases = new();
     static readonly Dictionary<string, EditorMode> m_canvasNames = new Dictionary<string, EditorMode>()
     {
         {"MainUI", EditorMode.Main },

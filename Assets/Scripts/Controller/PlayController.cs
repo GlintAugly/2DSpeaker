@@ -38,27 +38,27 @@ public class PlayController : MonoBehaviour
 	bool IsPauseInEditMode { get { return IsEditMode && m_scriptReader != null && m_editorSelectedIndex < m_scriptReader.CurrentIndex; } }
 
 	[SerializeField]
-	private GameObject m_textFrame;
+	private readonly GameObject m_textFrame;
 	[SerializeField]
-	private Animator m_blackBoard;
+	private readonly Animator m_blackBoard;
 	[SerializeField]
-	private Text m_blackBoardText;
+	private readonly Text m_blackBoardText;
 	[SerializeField]
-	private SpriteRenderer m_backGround;
+	private readonly SpriteRenderer m_backGround;
 	[SerializeField]
-	private Text m_credit;
+	private readonly Text m_credit;
 	[SerializeField]
-	private GameObject m_characterTemplate;
+	private readonly GameObject m_characterTemplate;
 	[SerializeField]
-	private Font m_defaultFont;
+	private readonly Font m_defaultFont;
 	[SerializeField]
-	private int m_defaultFontSize;
+	private readonly int m_defaultFontSize;
 	[SerializeField]
-	private Camera m_mainCamera;
+	private readonly Camera m_mainCamera;
 	public Camera MainCamera { get { return m_mainCamera; } }
 
-	private IDictionary<string, CharBody> m_characters = new Dictionary<string, CharBody>();
-	private IDictionary<string, Text> m_texts = new Dictionary<string, Text>();
+	private readonly Dictionary<string, CharBody> m_characters = new();
+	private readonly Dictionary<string, Text> m_texts = new();
 	private IDictionary<string, (CommandFunction, CommandSpec)> m_commandMap;
 	private JsonScriptReader m_scriptReader;
 	private float m_timer;

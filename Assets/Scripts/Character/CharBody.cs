@@ -9,7 +9,7 @@ public class CharBody : CharParts
 	/// </summary>
     private Vector3 m_moveVect;
     private float m_moveTimer;
-    private CharBodyEvents m_events = new();
+    private readonly CharBodyEvents m_events = new();
     public CharBodyEvents Events => m_events;
 
     const float MOVE_DURATION = 1f;

@@ -15,7 +15,7 @@ public class LipSync : MonoBehaviour
 	private SpriteRenderer m_mouthRenderer;
 	private CharParts m_charParts;
 	private Dictionary<string, LipSyncAnimationData> m_talkingSprites = new();
-	private float[] m_audioSamples = new float[GET_SAMPLES_LENGTH];
+	private readonly float[] m_audioSamples = new float[GET_SAMPLES_LENGTH];
 	private int m_lastTalkSpriteIndex = -1;
 	private float m_maxRms = MAX_RMS_DEFAULT;
 	private const int GET_SAMPLES_LENGTH = 1024;

@@ -30,22 +30,22 @@ public class CommandSpec : ScriptableObject
 {
 	[SerializeField]
 	[Tooltip("コマンド名")]
-	private string m_commandName;
+	private readonly string m_commandName;
 	[SerializeField]
 	[Tooltip("コマンドの説明")]
-	private string m_commandHint;
+	private readonly string m_commandHint;
 	
 	[SerializeField]
 	[Tooltip("パラメーター情報")]
-	private ParamInfo[] m_paramInfos;
+	private readonly ParamInfo[] m_paramInfos;
 	
 	[SerializeField]
 	[Tooltip("最小パラメーター数")]
-	private int m_minParamCount;
+	private readonly int m_minParamCount;
 	
 	[SerializeField]
 	[Tooltip("最大パラメーター数")]
-	private int m_maxParamCount;
+	private readonly int m_maxParamCount;
 	
 	public string CommandName => m_commandName;
 	/// <summary>パラメーター情報の配列</summary>

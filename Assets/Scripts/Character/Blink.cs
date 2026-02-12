@@ -11,7 +11,7 @@ public class Blink : MonoBehaviour
 		public Sprite[] animationSprites;
 		public float changeSpan;
 	}
-	private Dictionary<string, BlinkAnimationData> m_blinkSprites = new();
+	private readonly Dictionary<string, BlinkAnimationData> m_blinkSprites = new();
 	private SpriteRenderer m_eyeRenderer;
 	private CharParts m_charParts;
     private float m_nextTimer;

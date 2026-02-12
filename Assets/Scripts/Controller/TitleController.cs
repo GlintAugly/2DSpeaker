@@ -7,13 +7,13 @@ using System.Linq;
 public class TitleController : MonoBehaviour
 {
     [SerializeField]
-    private Dropdown projectDropdown;
+    private readonly Dropdown projectDropdown;
     [SerializeField]
-    private Button playButton;
+    private readonly Button playButton;
     [SerializeField]
-    private Button editButton;
+    private readonly Button editButton;
     [SerializeField]
-    private Text noProjectsText;
+    private readonly Text noProjectsText;
 
     private void Start()
     {
