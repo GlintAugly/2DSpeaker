@@ -95,7 +95,7 @@ public class LipSync : MonoBehaviour
 		}
 	}
 
-	void Start () 
+	void Awake () 
 	{
 		m_mouthRenderer = gameObject.GetComponent<SpriteRenderer>();
 		m_charParts = gameObject.GetComponent<CharParts>();
