@@ -12,11 +12,17 @@ public class LipSync : MonoBehaviour
 		public Sprite[] animationSprites;
 		public float changeSpan;
 	}
-    private AudioSource m_talkAudio = null;
+	private AudioSource m_talkAudio = null;
 	private SpriteRenderer m_mouthRenderer;
 	private CharParts m_charParts;
 	private Dictionary<string, LipSyncAnimationData> m_talkingSprites = new();
-	private Coroutine m_lipSyncCoroutine = null;
+	private float[] m_audioSamples = new float[0];
+	private int m_lastTimeSample = 0;
+	private int m_lastTalkSpriteIndex = -1;
+	private float m_maxRms = MAX_RMS_DEFAULT;
+	private const int MIN_CHANGE_INTERVAL = 100;
+	private const float RMS_BORDER_MULTIPLIER = 0.1f;
+	private const float MAX_RMS_DEFAULT = 0f;
 
 	public void Initialize(LipSyncInitializeDataItem[] lipSyncInitializeData)
 	{
@@ -46,6 +52,19 @@ public class LipSync : MonoBehaviour
 	public void SetTalkAudio(AudioSource audioSource)
 	{
 		m_talkAudio = audioSource;
+		m_lastTalkSpriteIndex = -1;
+		m_maxRms = MAX_RMS_DEFAULT;
+		if(m_talkAudio == null || m_talkAudio.clip == null)
+		{
+			m_audioSamples = new float[0];
+			return;
+		}
+		if (m_audioSamples.Length != m_talkAudio.clip.samples)
+		{
+			m_audioSamples = new float[m_talkAudio.clip.samples];
+		}
+		m_talkAudio.clip.GetData(m_audioSamples, 0);
+		m_lastTimeSample = 0;
 	}
 
 	// Use this for initialization
@@ -71,36 +90,62 @@ public class LipSync : MonoBehaviour
 		{
 			if(m_talkingSprites.ContainsKey(m_charParts.EmotionFile))
 			{
-				m_lipSyncCoroutine ??= StartCoroutine(LipSyncCoroutine(m_mouthRenderer.sprite, m_charParts.EmotionFile));
+				UpdateLipSyncByVolume(m_charParts.BaseSprite, m_charParts.EmotionFile);
 			}
 			else
 			{
 				// 該当する口パクアニメーションがないなら、判定にもう入らないようにする.
-				m_talkAudio = null;
+				SetTalkAudio(null);
 			}
 		}
 	}
 
-	IEnumerator LipSyncCoroutine(Sprite defaultSprite, string spriteName)
+	void UpdateLipSyncByVolume(Sprite defaultSprite, string spriteName)
 	{
-		float talkTimer = 0f;
 		if (m_talkingSprites.TryGetValue(spriteName, out LipSyncAnimationData animationData) == false)
 		{
-			yield break;
+			return;
 		}
-		while(m_charParts.EmotionFile == spriteName)
+		if (m_talkAudio == null || !m_talkAudio.isPlaying)
 		{
-			if(m_talkAudio == null || !m_talkAudio.isPlaying)
+			m_mouthRenderer.sprite = defaultSprite;
+			SetTalkAudio(null);
+			return;
+		}
+		int nowTimeSamples = m_talkAudio.timeSamples;
+		if (nowTimeSamples - m_lastTimeSample < MIN_CHANGE_INTERVAL)
+		{
+			return;
+		}
+		float sum = 0f;
+		for (int i = m_lastTimeSample; i < Math.Min(nowTimeSamples, m_audioSamples.Length); i++)
+		{
+			float sample = m_audioSamples[i];
+			sum += sample * sample;
+		}
+		float rms = Mathf.Sqrt(sum / m_audioSamples.Length);
+		AppDebug.Log("LipSync RMS: {0}", rms);
+		float rmsBorder = RMS_BORDER_MULTIPLIER * m_maxRms;
+		if(rms < rmsBorder)
+		{
+			rms = 0f;
+		}
+		m_maxRms = Mathf.Max(m_maxRms, rms);
+
+		int maxIndex = animationData.animationSprites.Length;
+		int talkIndex = Mathf.Clamp(Mathf.FloorToInt((rms - rmsBorder) / (m_maxRms - rmsBorder) * maxIndex) + 1, 0, maxIndex);
+		if (talkIndex != m_lastTalkSpriteIndex)
+		{
+			if(talkIndex == 0)
 			{
 				m_mouthRenderer.sprite = defaultSprite;
-				break;
 			}
-			talkTimer += Time.deltaTime;
-			int talkIndex = (int)(talkTimer / animationData.changeSpan) % animationData.animationSprites.Length;
-			m_mouthRenderer.sprite = animationData.animationSprites[talkIndex];
-			yield return null;
+			else
+			{
+				m_mouthRenderer.sprite = animationData.animationSprites[talkIndex - 1];
+			}
+			m_lastTalkSpriteIndex = talkIndex;
 		}
-		m_lipSyncCoroutine = null;
-		m_talkAudio = null;
+		m_lastTimeSample = nowTimeSamples;
 	}
 }

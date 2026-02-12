@@ -17,7 +17,8 @@ public class CharParts : MonoBehaviour
 
 	[SerializeField]
 	private EPartName m_partsName;
-	public string EmotionFile { get; private set;}
+	public string EmotionFile { get; private set; }
+	public Sprite BaseSprite { get; private set; }
 	private SpriteRenderer m_spriteRenderer;
 	protected SpriteRenderer SpriteRenderer
 	{
@@ -86,6 +87,7 @@ public class CharParts : MonoBehaviour
 			return;
 		}
 		SpriteRenderer.sprite = Readsprite;
+		BaseSprite = Readsprite;
 		EmotionFile = sFileName;
     }
 
