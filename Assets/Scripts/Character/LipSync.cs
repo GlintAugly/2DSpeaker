@@ -10,7 +10,6 @@ public class LipSync : MonoBehaviour
 	class LipSyncAnimationData
 	{
 		public Sprite[] animationSprites;
-		public float changeSpan;
 	}
 	private AudioSource m_talkAudio = null;
 	private SpriteRenderer m_mouthRenderer;
@@ -44,7 +43,6 @@ public class LipSync : MonoBehaviour
 				m_talkingSprites[initializeData.defaultMouthOpenSprite] = new LipSyncAnimationData
 				{
 					animationSprites = animSprites,
-					changeSpan = initializeData.changeSpan
 				};
 			}
 		}
