@@ -58,7 +58,6 @@ public class LipSync : MonoBehaviour
 			return;
 		}
 		PrepareAudioSamples();
-		m_talkAudio.clip.GetData(m_audioSamples, 0);
 		m_lastTimeSample = 0;
 	}
 
@@ -171,15 +170,11 @@ public class LipSync : MonoBehaviour
 		}
 		else
 		{
-			float rmsBorder = RMS_BORDER_MULTIPLIER * m_maxRms;
-			if(rms < rmsBorder)
-			{
-				rms = 0f;
-			}
 			m_maxRms = Mathf.Max(m_maxRms, rms);
+			float rmsBorder = RMS_BORDER_MULTIPLIER * m_maxRms;
 
 			int maxIndex = animationData.animationSprites.Length;
-			int talkIndex = Mathf.Clamp(Mathf.FloorToInt((rms - rmsBorder) / (m_maxRms - rmsBorder) * maxIndex) + 1, 0, maxIndex);
+			int talkIndex = Mathf.Clamp(Mathf.CeilToInt((rms - rmsBorder) / (m_maxRms - rmsBorder) * maxIndex), 0, maxIndex);
 			if (talkIndex != m_lastTalkSpriteIndex)
 			{
 				m_mouthRenderer.sprite = talkIndex == 0 ? defaultSprite : animationData.animationSprites[talkIndex - 1];
