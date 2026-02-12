@@ -15,7 +15,7 @@ public class EndingController : MonoBehaviour
     [SerializeField]
     private Text m_downerBody;
 	[SerializeField]
-	private readonly Text m_credit;
+	private Text m_credit;
 
     private string[] m_allTexts;
     private float m_stayTimer;
