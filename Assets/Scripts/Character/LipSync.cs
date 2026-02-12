@@ -55,9 +55,11 @@ public class LipSync : MonoBehaviour
 		m_maxRms = MAX_RMS_DEFAULT;
 		if(m_talkAudio == null || m_talkAudio.clip == null)
 		{
+			this.enabled = false;
 			return;
 		}
 		m_lastTimeSample = 0;
+		this.enabled = true;
 	}
 
 	void Awake () 
