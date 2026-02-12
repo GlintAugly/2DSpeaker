@@ -57,8 +57,8 @@ public class PlayController : MonoBehaviour
 	private Camera m_mainCamera;
 	public Camera MainCamera { get { return m_mainCamera; } }
 
-	private IDictionary<string, CharBody> m_characters = new Dictionary<string, CharBody>();
-	private IDictionary<string, Text> m_texts = new Dictionary<string, Text>();
+	private readonly Dictionary<string, CharBody> m_characters = new();
+	private readonly Dictionary<string, Text> m_texts = new();
 	private IDictionary<string, (CommandFunction, CommandSpec)> m_commandMap;
 	private JsonScriptReader m_scriptReader;
 	private float m_timer;

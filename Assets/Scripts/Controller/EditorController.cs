@@ -27,7 +27,7 @@ public class EditorController : MonoBehaviour
     [SerializeField]
     Button m_backToTitleButton;
 
-    Dictionary<EditorMode, GameObject> m_modeCanvases = new Dictionary<EditorMode, GameObject>();
+    readonly Dictionary<EditorMode, GameObject> m_modeCanvases = new();
     static readonly Dictionary<string, EditorMode> m_canvasNames = new Dictionary<string, EditorMode>()
     {
         {"MainUI", EditorMode.Main },

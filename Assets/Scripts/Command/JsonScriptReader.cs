@@ -6,7 +6,7 @@ using UnityEngine;
 /// </summary>
 public class JsonScriptReader
 {
-	private JsonCommandScript m_commandScript;
+	private readonly JsonCommandScript m_commandScript;
 	private int m_currentIndex = 0;
 	
 	public int CurrentIndex => m_currentIndex;
