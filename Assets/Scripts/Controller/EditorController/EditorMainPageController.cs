@@ -1,21 +1,14 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class EditorController : MonoBehaviour
+public class EditorMainPageController : MonoBehaviour, IEditController
 {
-    enum EditorMode
-    {
-        Main,
-        CharacterSetting,
-        ProjectSetting
-    }
-
+    public EditorController EditorController {private get; set;}
     [SerializeField]
     Button m_editCharacterButton;
-    [SerializeField]
-    GameObject m_editProjectMenu;
     [SerializeField]
     InputField m_projectNameInputField;
     [SerializeField]
@@ -27,13 +20,6 @@ public class EditorController : MonoBehaviour
     [SerializeField]
     Button m_backToTitleButton;
 
-    readonly Dictionary<EditorMode, GameObject> m_modeCanvases = new();
-    static readonly Dictionary<string, EditorMode> m_canvasNames = new Dictionary<string, EditorMode>()
-    {
-        {"MainUI", EditorMode.Main },
-        {"CharacterSettingUI", EditorMode.CharacterSetting },
-        {"EditProject", EditorMode.ProjectSetting },
-    };
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -60,46 +46,11 @@ public class EditorController : MonoBehaviour
             m_existingProjectsDropdown.gameObject.SetActive(false);
             m_editExistingProjectButton.gameObject.SetActive(false);
         }
-
-        var allObjects = Resources.FindObjectsOfTypeAll<GameObject>();
-        foreach (var obj in allObjects)
-        {
-            if (!obj.scene.IsValid())
-            {
-                continue;
-            }
-            if (!obj.CompareTag("EditorRootUI"))
-            {
-                continue;
-            }
-            if (m_canvasNames.TryGetValue(obj.name, out var mode))
-            {
-                m_modeCanvases[mode] = obj;
-            }
-            else
-            {
-                AppDebug.LogError("ERR: Unknown UI Canvas found: {0}", obj.name);
-            }
-        }
-        SwitchMode(EditorMode.Main);
-    }
-
-    void SwitchMode(EditorMode mode)
-    {
-        foreach (var kvp in m_modeCanvases)
-        {
-            kvp.Value.SetActive(kvp.Key == mode);
-        }
-    }
-
-    public void OnClickMainMode()
-    {
-        SwitchMode(EditorMode.Main);
     }
 
     void OnClickCharacterSettingMode()
     {
-        SwitchMode(EditorMode.CharacterSetting);
+        EditorController.GotoEditCharacter();
     }
     void OnClickNewProject()
     {
@@ -107,20 +58,18 @@ public class EditorController : MonoBehaviour
         {
             return;
         }
-        m_modeCanvases[EditorMode.ProjectSetting].GetComponent<EditProjectController>().m_projectName = m_projectNameInputField.text;
-        SwitchMode(EditorMode.ProjectSetting);
+        EditorController.GotoEditProject(m_projectNameInputField.text);
     }
 
     void OnClickEditExistingProject()
     {
         int selectedIndex = m_existingProjectsDropdown.value;
-        m_modeCanvases[EditorMode.ProjectSetting].GetComponent<EditProjectController>().m_projectName
-            = m_existingProjectsDropdown.options[selectedIndex].text;
-        SwitchMode(EditorMode.ProjectSetting);
+        string projectName = m_existingProjectsDropdown.options[selectedIndex].text;
+        EditorController.GotoEditProject(projectName);
     }
 
     void OnClickBackToTitle()
     {
-        SceneManager.LoadScene("Title");
+        EditorController.BacktoTitle();
     }
 }

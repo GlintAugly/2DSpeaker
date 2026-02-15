@@ -3,16 +3,74 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
 using UnityEngine.EventSystems;
+using System.Collections.Generic;
 
-public class EditProjectController : MonoBehaviour
+public class EditProjectController : MonoBehaviour, IEditController
 {
+    public EditorController EditorController { private get; set;}
     [NonSerialized]
-    public string m_projectName;
+    public string ProjectName;
     [SerializeField]
     EventSystem m_eventSystemForEditor;
+
+    enum EditProjectMode
+    {
+        Main,
+        InitializeEdit,
+        ScriptEdit,
+    }
+    readonly Dictionary<EditProjectMode, GameObject> m_modeCanvases = new();
+    static readonly Dictionary<EditProjectMode, Type> m_modeControllers = new()
+    {
+        {EditProjectMode.Main, typeof(EditProjectMainController) },
+        {EditProjectMode.InitializeEdit, typeof(EditInitializeController) },
+        {EditProjectMode.ScriptEdit, typeof(EditScriptController) },
+    };
     PlayController m_playController;
+    
     const string PLAY_SCENE_NAME = "Play";
     const float PLAY_CAMERA_CLAMP = 0.7f;
+    
+    public void GotoEditProjectMain()
+    {
+        SwitchMode(EditProjectMode.Main);
+    }
+
+    public void GotoEditInitialize()
+    {
+        SwitchMode(EditProjectMode.InitializeEdit);
+    }
+
+    public void GotoEditScript()
+    {
+        SwitchMode(EditProjectMode.ScriptEdit);
+    }
+
+    public void BackToEditorMain()
+    {
+        EditorController.GotoMain();
+    }
+
+    void Awake()
+    {
+        foreach (var kvp in m_modeControllers)
+        {
+            var mode = kvp.Key;
+            var type = kvp.Value;
+            var canvasObj = GetComponentInChildren(type, true);
+            if (canvasObj == null)
+            {
+                AppDebug.LogError("ERR: EditProjectControllerの子オブジェクトに{0}がありません", type.Name);
+                continue;
+            }
+            if (canvasObj is IEditProjectController controller)
+            {
+                controller.EditProjectController = this;
+            }
+            m_modeCanvases[mode] = canvasObj.gameObject;
+        }
+        SwitchMode(EditProjectMode.Main);
+    }
     void OnEnable()
     {
         // EditモードとしてPlayシーンを読み込む.そのために、いったんプロジェクト名をクリアしておく.
@@ -24,7 +82,7 @@ public class EditProjectController : MonoBehaviour
             // LoadSceneは1フレーム後に行われるので、完了を待つようにする.
             StartCoroutine(AfterLoadingPlaySceneCoroutine(playScene));
         }
-        if(string.IsNullOrEmpty(m_projectName))
+        if(string.IsNullOrEmpty(ProjectName))
         {
             AppDebug.LogError("ERR: Project name is not set in EditProjectController.");
             return;
@@ -54,7 +112,7 @@ public class EditProjectController : MonoBehaviour
         }
         var offset = 1.0f - PLAY_CAMERA_CLAMP;
         m_playController.MainCamera.rect = new Rect(offset, offset, PLAY_CAMERA_CLAMP, PLAY_CAMERA_CLAMP);
-        ProjectManager.SetProjectName(m_projectName);
+        ProjectManager.SetProjectName(ProjectName);
 
         // 手動で初期化.
         if(ModifiableAssetsUtils.IsFileExists(ProjectManager.GetScriptFolder(), Definition.PLAY_SCENE_INITIALIZE_DATA_FILE))
@@ -74,5 +132,13 @@ public class EditProjectController : MonoBehaviour
         SoundManager.StopSE();
         await SceneManager.UnloadSceneAsync(PLAY_SCENE_NAME);
         m_eventSystemForEditor.gameObject.SetActive(true);
+    }
+
+    void SwitchMode(EditProjectMode mode)
+    {
+        foreach (var kvp in m_modeCanvases)
+        {
+            kvp.Value.SetActive(kvp.Key == mode);
+        }
     }
 }
