@@ -25,6 +25,10 @@ public class LipSync : MonoBehaviour
 	public void Initialize(LipSyncInitializeDataItem[] lipSyncInitializeData)
 	{
 		m_talkingSprites.Clear();
+		if(lipSyncInitializeData == null)
+		{
+			return;
+		}
 		foreach (var initializeData in lipSyncInitializeData)
 		{
 			if (string.IsNullOrEmpty(initializeData.defaultMouthOpenSprite) == false)

@@ -24,6 +24,10 @@ public class Blink : MonoBehaviour
 	public void Initialize(BlinkInitializeDataItem[] blinkInitializeData)
 	{
 		m_blinkSprites.Clear();
+		if(blinkInitializeData == null)
+		{
+			return;
+		}
 		foreach (var initializeData in blinkInitializeData)
 		{
 			if (string.IsNullOrEmpty(initializeData.startSprite) == false)
