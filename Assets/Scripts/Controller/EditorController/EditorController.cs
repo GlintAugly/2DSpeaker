@@ -73,7 +73,7 @@ public class EditorController : MonoBehaviour
         SwitchMode(EditorMode.Main);
     }
 
-    public void BacktoTitle()
+    public void BackToTitle()
     {
         SceneManager.LoadScene("Title");
     }
