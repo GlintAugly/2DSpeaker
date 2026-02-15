@@ -13,7 +13,7 @@ public class EditorController : MonoBehaviour
         ProjectSetting
     }
 
-    readonly Dictionary<EditorMode, GameObject> m_modeCanvases = new();
+    readonly Dictionary<EditorMode, IEditController> m_modeCanvases = new();
     static readonly Dictionary<EditorMode, Type> m_modeControllers = new()
     {
         {EditorMode.Main, typeof(EditorMainPageController) },
@@ -34,10 +34,14 @@ public class EditorController : MonoBehaviour
                 AppDebug.LogError("ERR: EditorControllerの子オブジェクトに{0}がありません", type.Name);
                 continue;
             }
-            m_modeCanvases[mode] = canvasObj.gameObject;
             if (canvasObj is IEditController objInterface)
             {
                 objInterface.EditorController = this;
+                m_modeCanvases[mode] = objInterface;
+            }
+            else
+            {
+                AppDebug.LogError("ERR: {0}がIEditControllerを実装していません", type.Name);
             }
         }
         SwitchMode(EditorMode.Main);
@@ -47,13 +51,13 @@ public class EditorController : MonoBehaviour
     {
         foreach (var kvp in m_modeCanvases)
         {
-            kvp.Value.SetActive(kvp.Key == mode);
+            kvp.Value.gameObject.SetActive(kvp.Key == mode);
         }
     }
 
     public void GotoEditProject(string projectName)
     {
-        EditProjectController editProjectController = m_modeCanvases[EditorMode.ProjectSetting].GetComponentInChildren<EditProjectController>(true);
+        EditProjectController editProjectController = m_modeCanvases[EditorMode.ProjectSetting] as EditProjectController;
         if (editProjectController == null)
         {
             AppDebug.LogError("ERR: EditProjectControllerが子オブジェクトにありません");

@@ -19,7 +19,7 @@ public class EditProjectController : MonoBehaviour, IEditController
         InitializeEdit,
         ScriptEdit,
     }
-    readonly Dictionary<EditProjectMode, GameObject> m_modeCanvases = new();
+    readonly Dictionary<EditProjectMode, IEditProjectController> m_modeCanvases = new();
     static readonly Dictionary<EditProjectMode, Type> m_modeControllers = new()
     {
         {EditProjectMode.Main, typeof(EditProjectMainController) },
@@ -66,8 +66,12 @@ public class EditProjectController : MonoBehaviour, IEditController
             if (canvasObj is IEditProjectController controller)
             {
                 controller.EditProjectController = this;
+                m_modeCanvases[mode] = controller;
             }
-            m_modeCanvases[mode] = canvasObj.gameObject;
+            else
+            {
+                AppDebug.LogError("ERR: {0}がIEditProjectControllerを実装していません", type.Name);
+            }
         }
         SwitchMode(EditProjectMode.Main);
     }
@@ -138,7 +142,7 @@ public class EditProjectController : MonoBehaviour, IEditController
     {
         foreach (var kvp in m_modeCanvases)
         {
-            kvp.Value.SetActive(kvp.Key == mode);
+            kvp.Value.gameObject.SetActive(kvp.Key == mode);
         }
     }
 }
