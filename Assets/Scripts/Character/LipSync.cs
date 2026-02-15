@@ -24,6 +24,7 @@ public class LipSync : MonoBehaviour
 
 	public void Initialize(LipSyncInitializeDataItem[] lipSyncInitializeData)
 	{
+		m_talkingSprites.Clear();
 		foreach (var initializeData in lipSyncInitializeData)
 		{
 			if (string.IsNullOrEmpty(initializeData.defaultMouthOpenSprite) == false)
@@ -77,7 +78,7 @@ public class LipSync : MonoBehaviour
 	// Update is called once per frame
 	void Update () 
 	{
-        if (m_talkAudio != null)
+        if (m_talkingSprites.Count > 0 && m_talkAudio != null)
 		{
 			if(m_talkingSprites.ContainsKey(m_charParts.EmotionFile))
 			{
