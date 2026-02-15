@@ -23,6 +23,11 @@ public class Blink : MonoBehaviour
 
 	public void Initialize(BlinkInitializeDataItem[] blinkInitializeData)
 	{
+		m_blinkSprites.Clear();
+		if(blinkInitializeData == null)
+		{
+			return;
+		}
 		foreach (var initializeData in blinkInitializeData)
 		{
 			if (string.IsNullOrEmpty(initializeData.startSprite) == false)
@@ -56,7 +61,7 @@ public class Blink : MonoBehaviour
 
 	void Update ()
 	{
-		if (m_blinkCoroutine == null)
+		if (m_blinkSprites.Count > 0 && m_blinkCoroutine == null)
 		{
 			m_nextTimer -= Time.deltaTime;
 			if (m_nextTimer < 0 )
