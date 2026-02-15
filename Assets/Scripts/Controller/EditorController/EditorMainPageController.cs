@@ -70,6 +70,6 @@ public class EditorMainPageController : MonoBehaviour, IEditController
 
     void OnClickBackToTitle()
     {
-        EditorController.BacktoTitle();
+        EditorController.BackToTitle();
     }
 }
