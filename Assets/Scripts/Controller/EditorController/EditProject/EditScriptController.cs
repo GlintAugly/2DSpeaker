@@ -8,7 +8,7 @@ public class EditScriptController : MonoBehaviour, IEditProjectController
 	[SerializeField]
 	Button m_backButton;
 
-	public void Start()
+	void Start()
 	{
 		m_backButton.onClick.AddListener(OnClickBack);
 	}
