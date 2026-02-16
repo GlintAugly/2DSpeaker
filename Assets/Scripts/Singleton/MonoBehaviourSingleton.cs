@@ -28,6 +28,8 @@ public class MonoBehaviourSingleton<T> : MonoBehaviour where T : MonoBehaviour
         }
     }
 
+    public static bool IsInitialized => instance != null;
+
     protected virtual void Awake()
     {
         // スレッドセーフ性を高める

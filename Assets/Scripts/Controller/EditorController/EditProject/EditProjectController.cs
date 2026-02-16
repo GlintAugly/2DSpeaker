@@ -130,12 +130,22 @@ public class EditProjectController : MonoBehaviour, IEditController
 
     async void OnDisable()
     {
-        ProjectManager.SetProjectName(string.Empty);
-        SoundManager.StopVoice();
-        SoundManager.StopBGM();
-        SoundManager.StopSE();
-        await SceneManager.UnloadSceneAsync(PLAY_SCENE_NAME);
-        m_eventSystemForEditor.gameObject.SetActive(true);
+        if(ProjectManager.IsInitialized)
+        {
+            ProjectManager.SetProjectName(string.Empty);
+        }
+        if(SoundManager.IsInitialized)
+        {
+            SoundManager.StopAll();
+        }
+        if (SceneManager.GetSceneByName(PLAY_SCENE_NAME).isLoaded)
+        {
+            await SceneManager.UnloadSceneAsync(PLAY_SCENE_NAME);
+        }
+        if (m_eventSystemForEditor != null)
+        {
+            m_eventSystemForEditor.gameObject.SetActive(true);
+        }
     }
 
     void SwitchMode(EditProjectMode mode)

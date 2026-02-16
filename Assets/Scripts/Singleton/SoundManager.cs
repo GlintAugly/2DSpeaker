@@ -144,6 +144,13 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
         }
     }
 
+    public static void StopAll()
+    {
+        StopBGM();
+        StopSE();
+        StopVoice();
+    }
+
     private IEnumerator RoopBGMCoroutine()
     {
         while (bgmLoopSampleLength != NO_LOOP && bgmLoopEndSamplePosition != NO_LOOP)
