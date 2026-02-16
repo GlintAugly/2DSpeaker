@@ -251,7 +251,6 @@ public class ReorderableVirtualizedList : MonoBehaviour
         int insertIndex = GetInsertIndexFromPointer(eventData);
 
         m_dragStartIndex = -1;
-        m_dragStartIndex = -1;
         m_dragInsertIndex = -1;
         SetViewAlpha(m_dragSourceView, 1f);
         m_dragSourceView = null;
