@@ -75,7 +75,7 @@ public class Fade : MonoBehaviourSingleton<Fade> {
             Instance.m_render.sprite = sprite;
         }
         Instance.m_canvas.worldCamera = targetCamera;
-        if(targetCamera != null)
+        if (targetCamera != null)
         {
             Instance.m_canvas.sortingLayerName = FADE_LAYER_NAME;
         }
@@ -101,7 +101,7 @@ public class Fade : MonoBehaviourSingleton<Fade> {
         }
         Instance.m_fade = EFadeStatus.FadeOut;
         Instance.m_canvas.worldCamera = targetCamera;
-        if(targetCamera != null)
+        if (targetCamera != null)
         {
             Instance.m_canvas.sortingLayerName = FADE_LAYER_NAME;
         }

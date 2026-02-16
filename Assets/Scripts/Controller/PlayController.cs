@@ -145,7 +145,7 @@ public class PlayController : MonoBehaviour
 	/// </summary>
 	void Start()
 	{
-		if(ProjectManager.IsProjectSelected() == false)
+		if (ProjectManager.IsProjectSelected() == false)
 		{
 			// プロジェクトが選択されていないときはエディットモードとする。
 			EditorSelectedIndex = 0;
@@ -155,7 +155,7 @@ public class PlayController : MonoBehaviour
 		PlaySceneInitializeData initData = PlaySceneInitializeData.LoadFromJson(
 			ModifiableAssetsUtils.LoadTextFile(ProjectManager.GetScriptFolder(), Definition.PLAY_SCENE_INITIALIZE_DATA_FILE)
 		);
-		if(initData == null || initData.characters == null || initData.characters.Length == 0)
+		if (initData == null || initData.characters == null || initData.characters.Length == 0)
 		{
 			// 初期化データの読み込みに失敗
 			AppDebug.LogError("PlayController: 初期化データの読み込みに失敗しました。");
@@ -203,7 +203,7 @@ public class PlayController : MonoBehaviour
 
 	void LoadScriptReader()
 	{
-		if(ModifiableAssetsUtils.IsFileExists(ProjectManager.GetScriptFolder(), Definition.EXEC_SCRIPT_FILE) == false)
+		if (ModifiableAssetsUtils.IsFileExists(ProjectManager.GetScriptFolder(), Definition.EXEC_SCRIPT_FILE) == false)
 		{
 			// Editモードではスクリプトファイルが存在しなくてもよい.
 			if (!IsEditMode)
@@ -262,7 +262,7 @@ public class PlayController : MonoBehaviour
 	{
 		baseImage.rectTransform.anchoredPosition = initData.basePosition;
 		baseImage.rectTransform.sizeDelta = initData.baseSize;
-		if(string.IsNullOrEmpty(initData.baseFileName) == false)
+		if (string.IsNullOrEmpty(initData.baseFileName) == false)
 		{
 			Sprite baseSprite = ModifiableAssetsUtils.LoadSprite(Definition.IMAGE_FOLDER, initData.baseFileName);
 			if (baseSprite != null)
@@ -278,13 +278,13 @@ public class PlayController : MonoBehaviour
 		{
 			text.font = m_defaultFont;
 			text.fontSize = m_defaultFontSize;
-			if(string.IsNullOrEmpty(initData.fontName) == false)
+			if (string.IsNullOrEmpty(initData.fontName) == false)
 			{
 				Font loadedFont = ModifiableAssetsUtils.LoadFont(initData.fontName, initData.fontSize);
-				if(loadedFont != null)
+				if (loadedFont != null)
 				{
 					text.font = loadedFont;
-					if(initData.fontSize > 0)
+					if (initData.fontSize > 0)
 					{
 						text.fontSize = initData.fontSize;
 					}
@@ -309,16 +309,16 @@ public class PlayController : MonoBehaviour
 	/// </summary>
 	void Update ()
 	{
-		if(m_scriptReader == null)
+		if (m_scriptReader == null)
 		{
 			// スクリプトファイルが存在しない.
 			return;
 		}
-		if(IsPauseInEditMode)
+		if (IsPauseInEditMode)
 		{
 			return;
 		}
-		if(EditorSelectedIndex > m_scriptReader.CurrentIndex)
+		if (EditorSelectedIndex > m_scriptReader.CurrentIndex)
 		{
 			// Editorモードで現在のインデックスまで進める.
 			m_stopMute = EditorSelectedIndex - 1;
@@ -446,7 +446,7 @@ public class PlayController : MonoBehaviour
 			AppDebug.LogError("Command 'setupBGM' missing required parameters. index:{0}", m_scriptReader.CurrentIndex);
 			return false;
 		}
-		if(SafeCast(parameters, spec, "loopStart", out int loopStart) == false
+		if (SafeCast(parameters, spec, "loopStart", out int loopStart) == false
 		|| SafeCast(parameters, spec, "loopEnd", out int loopEndPos) == false)
 		{
 			SetupBGM(bgmName);
@@ -660,7 +660,7 @@ public class PlayController : MonoBehaviour
 		}
 		var voiceLength = voice.length + m_interval;
 		var voiceSource = SoundManager.PlayVoice(voice);
-		if(voiceSource == null)
+		if (voiceSource == null)
 		{
 			AppDebug.LogError("Speak: Cannot play voice file. fileName={0}", fileName);
 			return;

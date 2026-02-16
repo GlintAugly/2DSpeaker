@@ -25,7 +25,7 @@ public class LipSync : MonoBehaviour
 	public void Initialize(LipSyncInitializeDataItem[] lipSyncInitializeData)
 	{
 		m_talkingSprites.Clear();
-		if(lipSyncInitializeData == null)
+		if (lipSyncInitializeData == null)
 		{
 			return;
 		}
@@ -56,7 +56,7 @@ public class LipSync : MonoBehaviour
 		m_talkAudio = audioSource;
 		m_lastTalkSpriteIndex = -1;
 		m_maxRms = MAX_RMS_DEFAULT;
-		if(m_talkAudio == null || m_talkAudio.clip == null)
+		if (m_talkAudio == null || m_talkAudio.clip == null)
 		{
 			this.enabled = false;
 			return;
@@ -84,7 +84,7 @@ public class LipSync : MonoBehaviour
 	{
         if (m_talkingSprites.Count > 0 && m_talkAudio != null)
 		{
-			if(m_talkingSprites.ContainsKey(m_charParts.EmotionFile))
+			if (m_talkingSprites.ContainsKey(m_charParts.EmotionFile))
 			{
 				UpdateLipSyncByVolume(m_charParts.BaseSprite, m_charParts.EmotionFile);
 			}
@@ -117,7 +117,7 @@ public class LipSync : MonoBehaviour
 		}
 		float rms = Mathf.Sqrt(sum / m_audioSamples.Length);
 		
-		if(rms <= 0f)
+		if (rms <= 0f)
 		{
 			m_mouthRenderer.sprite = defaultSprite;
 			m_lastTalkSpriteIndex = 0;

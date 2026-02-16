@@ -80,13 +80,13 @@ public class EditProjectController : MonoBehaviour, IEditController
         // EditモードとしてPlayシーンを読み込む.そのために、いったんプロジェクト名をクリアしておく.
         ProjectManager.SetProjectName(string.Empty);
         var loadSceneParameters = new LoadSceneParameters(LoadSceneMode.Additive);
-        if(!SceneManager.GetSceneByName(PLAY_SCENE_NAME).isLoaded)
+        if (!SceneManager.GetSceneByName(PLAY_SCENE_NAME).isLoaded)
         {
             var playScene = SceneManager.LoadScene(PLAY_SCENE_NAME, loadSceneParameters);
             // LoadSceneは1フレーム後に行われるので、完了を待つようにする.
             StartCoroutine(AfterLoadingPlaySceneCoroutine(playScene));
         }
-        if(string.IsNullOrEmpty(ProjectName))
+        if (string.IsNullOrEmpty(ProjectName))
         {
             AppDebug.LogError("ERR: Project name is not set in EditProjectController.");
             return;
@@ -104,7 +104,7 @@ public class EditProjectController : MonoBehaviour, IEditController
         foreach (var rootObj in playScene.GetRootGameObjects())
         {
             m_playController = rootObj.GetComponent<PlayController>();
-            if(m_playController != null)
+            if (m_playController != null)
             {
                 break;
             }
@@ -119,7 +119,7 @@ public class EditProjectController : MonoBehaviour, IEditController
         ProjectManager.SetProjectName(ProjectName);
 
         // 手動で初期化.
-        if(ModifiableAssetsUtils.IsFileExists(ProjectManager.GetScriptFolder(), Definition.PLAY_SCENE_INITIALIZE_DATA_FILE))
+        if (ModifiableAssetsUtils.IsFileExists(ProjectManager.GetScriptFolder(), Definition.PLAY_SCENE_INITIALIZE_DATA_FILE))
         {
             PlaySceneInitializeData initData = PlaySceneInitializeData.LoadFromJson(
                 ModifiableAssetsUtils.LoadTextFile(ProjectManager.GetScriptFolder(), Definition.PLAY_SCENE_INITIALIZE_DATA_FILE)
