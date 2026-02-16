@@ -140,6 +140,7 @@ public class ReorderableVirtualizedList : MonoBehaviour
                 m_items.Add(items[i]);
             }
         }
+        RebuildLayoutData();
 
         if (!string.IsNullOrEmpty(selectedId))
         {
@@ -170,7 +171,6 @@ public class ReorderableVirtualizedList : MonoBehaviour
             ? m_scrollRect.normalizedPosition
             : new Vector2(0f, 1f);
 
-        RebuildLayoutData();
         RefreshVisibleRange();
 
         if (preserveScrollPosition && m_scrollRect != null)
@@ -198,7 +198,6 @@ public class ReorderableVirtualizedList : MonoBehaviour
         }
 
         m_selectedIndex = index;
-        RebuildLayoutData();
         RefreshVisibleRange(true);
         OnSelected?.Invoke(index);
         OnSelectedWithData?.Invoke(index, m_items[index]);
@@ -309,7 +308,6 @@ public class ReorderableVirtualizedList : MonoBehaviour
             m_selectedIndex++;
         }
 
-        RebuildLayoutData();
         RefreshVisibleRange();
         return targetIndex;
     }
@@ -592,6 +590,10 @@ public class ReorderableVirtualizedList : MonoBehaviour
 
     void UpdateDragGhostPosition(PointerEventData eventData)
     {
+        if (m_dragGhostView == null || m_dragGhostView.Root == null)
+        {
+            return;
+        }
         if (ScreenPointToLocalPointWhenDragging(eventData, out var localPoint))
         {
             m_dragGhostView.Root.anchoredPosition = localPoint;
