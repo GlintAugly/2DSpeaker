@@ -40,6 +40,11 @@ public class EditScriptController : MonoBehaviour, IEditProjectController
 			commandScript = null;
 		}
 
+		if (commandScript == null)
+		{
+			return;
+		}
+
         List<JsonCommandListItemData> listDatas = new(commandScript.commands.Length);
         for (int i = 0; i < commandScript.commands.Length; i++)
         {
