@@ -130,11 +130,11 @@ public class EditProjectController : MonoBehaviour, IEditController
 
     async void OnDisable()
     {
-        if(ProjectManager.IsInitialized)
+        if (ProjectManager.IsInitialized)
         {
             ProjectManager.SetProjectName(string.Empty);
         }
-        if(SoundManager.IsInitialized)
+        if (SoundManager.IsInitialized)
         {
             SoundManager.StopAll();
         }
