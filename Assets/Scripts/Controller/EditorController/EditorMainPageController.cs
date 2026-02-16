@@ -28,7 +28,7 @@ public class EditorMainPageController : MonoBehaviour, IEditController
         m_newProjectButton.onClick.AddListener(OnClickNewProject);
         m_backToTitleButton.onClick.AddListener(OnClickBackToTitle);
         string[] projects = ProjectManager.GetAllProjects();
-        if(projects.Length > 0)
+        if (projects.Length > 0)
         {
             m_existingProjectsDropdown.ClearOptions();
             var options = new List<Dropdown.OptionData>(projects.Length);
@@ -54,7 +54,7 @@ public class EditorMainPageController : MonoBehaviour, IEditController
     }
     void OnClickNewProject()
     {
-        if(string.IsNullOrEmpty(m_projectNameInputField.text))
+        if (string.IsNullOrEmpty(m_projectNameInputField.text))
         {
             return;
         }

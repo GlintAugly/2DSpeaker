@@ -95,7 +95,7 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
     {
         foreach(var source in Instance.seSource)
         {
-            if(!source.isPlaying)
+            if (!source.isPlaying)
             {
                 source.clip = clip;
                 source.loop = false;
@@ -110,7 +110,7 @@ public class SoundManager : MonoBehaviourSingleton<SoundManager>
     {
         for(int i = 0; i < VOICE_SOURCE_COUNT; i++)
         {
-            if(!Instance.voiceSource[i].isPlaying)
+            if (!Instance.voiceSource[i].isPlaying)
             {
                 Instance.voiceSource[i].clip = clip;
                 Instance.voiceSource[i].loop = false;

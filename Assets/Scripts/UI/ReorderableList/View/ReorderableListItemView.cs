@@ -56,11 +56,11 @@ public class ReorderableListItemView : MonoBehaviour, IPointerClickHandler, IBeg
     {
         get
         {
-            if(m_expandedRoot != null && m_expandedRoot.gameObject.activeSelf)
+            if (m_expandedRoot != null && m_expandedRoot.gameObject.activeSelf)
             {
                 return m_expandedRoot.rect.height;
             }
-            else if(m_compactRoot != null && m_compactRoot.gameObject.activeSelf)
+            else if (m_compactRoot != null && m_compactRoot.gameObject.activeSelf)
             {
                 return m_compactRoot.rect.height;
             }
