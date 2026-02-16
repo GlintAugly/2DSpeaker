@@ -250,7 +250,6 @@ public class ReorderableVirtualizedList : MonoBehaviour
         int insertIndex = GetInsertIndexFromPointer(eventData);
 
         m_dragStartIndex = -1;
-        m_dragStartIndex = -1;
         m_dragInsertIndex = -1;
         SetViewAlpha(m_dragSourceView, 1f);
         m_dragSourceView = null;
@@ -400,7 +399,7 @@ public class ReorderableVirtualizedList : MonoBehaviour
         for (int i = 0; i < keys.Count; i++)
         {
             int index = keys[i];
-            if (index >= startIndex && index <= endIndex || index == m_dragStartIndex)
+            if ((index >= startIndex && index <= endIndex) || index == m_dragStartIndex)
             {
                 continue;
             }
