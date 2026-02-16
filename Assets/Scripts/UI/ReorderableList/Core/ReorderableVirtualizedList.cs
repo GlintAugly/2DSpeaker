@@ -402,7 +402,7 @@ public class ReorderableVirtualizedList : MonoBehaviour
         for (int i = 0; i < keys.Count; i++)
         {
             int index = keys[i];
-            if (index >= startIndex && index <= endIndex || index == m_dragStartIndex)
+            if ((index >= startIndex && index <= endIndex) || index == m_dragStartIndex)
             {
                 continue;
             }
